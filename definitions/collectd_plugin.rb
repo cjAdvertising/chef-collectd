@@ -7,9 +7,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +22,7 @@ define :collectd_plugin, :options => {}, :template => nil, :cookbook => nil do
     owner "root"
     group "root"
     mode "644"
-    if params[:template].blank?
+    if params[:template].nil?
       source "plugin.conf.erb"
       cookbook params[:cookbook] || "collectd"
     else
@@ -37,7 +37,7 @@ end
 define :collectd_python_plugin, :options => {}, :module => nil, :path => nil do
   begin
     t = resources(:template => "/etc/collectd/plugins/python.conf")
-  rescue ArgumentError
+  rescue Chef::Exceptions::ResourceNotFound
     collectd_plugin "python" do
       options :paths=>[node[:collectd][:plugin_dir]], :modules=>{}
       template "python_plugin.conf.erb"
@@ -45,7 +45,7 @@ define :collectd_python_plugin, :options => {}, :module => nil, :path => nil do
     end
     retry
   end
-  if not params[:path].blank?
+  if not params[:path].nil?
     t.variables[:options][:paths] << params[:path]
   end
   t.variables[:options][:modules][params[:module] || params[:name]] = params[:options]
