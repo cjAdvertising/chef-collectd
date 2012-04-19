@@ -50,3 +50,17 @@ define :collectd_python_plugin, :options => {}, :module => nil, :path => nil do
   end
   t.variables[:options][:modules][params[:module] || params[:name]] = params[:options]
 end
+
+define :collectd_perl_plugin, :options => {}, :module => nil do
+  begin
+    t = resources(:template => "/etc/collectd/plugins/perl.conf")
+  rescue Chef::Exceptions::ResourceNotFound
+    collectd_plugin "perl" do
+      options :paths=>[node[:collectd][:plugin_dir]], :modules=>{}
+      template "perl_plugin.conf.erb"
+      cookbook "collectd"
+    end
+    retry
+  end
+  t.variables[:options][:modules][params[:module] || params[:name]] = params[:options]
+end
